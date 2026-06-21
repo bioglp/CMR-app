@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CMR">
+<title>CMR 2026</title>
+<link rel="apple-touch-icon" id="apple-icon">
+<link rel="icon" id="favicon">
+<link rel="manifest" id="pwa-manifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117;
+    --surface: #1c1f2b;
+    --surface2: #252836;
+    --accent: #4f8ef7;
+    --accent2: #e06c75;
+    --green: #56b365;
+    --text: #e8eaf0;
+    --muted: #8b90a0;
+    --border: #2e3245;
+    --radius: 12px;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    padding-top: calc(14px + env(safe-area-inset-top));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+  header span { font-size: 12px; color: var(--muted); }
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab.active-recap   { color: var(--green);   border-bottom-color: var(--green);   }
+  .tab.active-export  { color: var(--accent2); border-bottom-color: var(--accent2); }
+  .tab.active-list    { color: #f0c040;        border-bottom-color: #f0c040;        }
+
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .row { display: flex; gap: 10px; }
+  .field { flex: 1; }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  input, select, textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 16px;
+    color: var(--text);
+    outline: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: none; height: 72px; font-size: 15px; }
+  .readonly-field {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 16px;
+    color: var(--muted);
+  }
+
+  /* SEX TOGGLE */
+  .sex-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 22px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sex-btn.active-m { border-color: var(--accent); background: rgba(79,142,247,0.15); color: var(--accent); }
+  .sex-btn.active-f { border-color: var(--accent2); background: rgba(224,108,117,0.15); color: var(--accent2); }
+  .sex-label { font-size: 11px; margin-top: 2px; }
+
+  /* COLOR TOGGLE */
+  .color-toggle { display: flex; gap: 8px; }
+  .color-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .color-btn.active-black { border-color: #aaa; background: rgba(200,200,200,0.1); color: #ccc; }
+  .color-btn.active-blue  { border-color: var(--accent); background: rgba(79,142,247,0.15); color: var(--accent); }
+  .color-btn.active-green { border-color: var(--green); background: rgba(86,179,101,0.15); color: var(--green); }
+  .color-btn.active-red   { border-color: var(--accent2); background: rgba(224,108,117,0.15); color: var(--accent2); }
+
+  /* FLAG RADIO */
+  .flag-row { display: flex; gap: 12px; }
+  .flag-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .flag-btn.active { border-color: var(--accent); background: rgba(44,111,212,0.12); color: var(--accent); }
+  .flag-radio { display: none; }
+  .flag-btn.active .flag-radio {
+    border-color: var(--green);
+    background: var(--green);
+    box-shadow: 0 0 0 3px rgba(86,179,101,0.2);
+  }
+  .flag-btn.active .flag-radio::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  /* SKY TOGGLE */
+  .sky-toggle { display: flex; gap: 8px; }
+  .sky-btn {
+    flex: 1;
+    padding: 10px 6px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 22px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .sky-label { font-size: 10px; margin-top: 2px; font-weight: 600; color: var(--muted); }
+  .sky-btn.active { border-color: var(--accent); background: rgba(79,142,247,0.15); }
+
+  /* RECAPTURE */
+  .recapture-row { display: flex; gap: 8px; align-items: flex-end; }
+  .recapture-row .field { flex: 1; }
+  .btn-search {
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .recapture-info {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 8px;
+    display: none;
+  }
+  .recapture-info.found   { color: var(--green);   border: 1px solid var(--green);   display: block; }
+  .recapture-info.notfound{ color: var(--accent2);  border: 1px solid var(--accent2); display: block; }
+
+  /* SUBMIT */
+  .btn-submit {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: opacity 0.2s, background 0.3s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-submit:active { opacity: 0.8; }
+  .btn-new   { background: var(--accent); color: #fff; }
+  .btn-recap { background: var(--green);  color: #fff; }
+
+  /* LIST */
+  .day-header {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); padding: 12px 4px 6px;
+  }
+  .record-wrap {
+    position: relative;
+    margin-bottom: 8px;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .record-delete {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 80px;
+    background: var(--accent2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    cursor: pointer;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .record-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: 44px 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    transition: transform 0.2s ease, border-color 0.15s ease;
+    will-change: transform;
+  }
+  .rec-id-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .rec-id { font-size: 22px; font-weight: 900; color: var(--text); line-height: 1; }
+  .rec-body { min-width: 0; }
+  .rec-main { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .rec-species { font-size: 12px; color: var(--muted); font-style: italic; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rec-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .rec-note { font-size: 11px; color: var(--accent); margin-top: 2px; font-style: italic; }
+  .rec-measures { text-align: right; font-size: 11px; color: var(--muted); line-height: 1.6; white-space: nowrap; }
+  .badge {
+    font-size: 11px; font-weight: 700;
+    padding: 2px 7px; border-radius: 20px;
+    background: rgba(79,142,247,0.2); color: var(--accent);
+  }
+  .badge.recap { background: rgba(86,179,101,0.2); color: var(--green); }
+
+  /* EXPORT */
+  .btn-export {
+    width: 100%; padding: 14px;
+    border-radius: var(--radius); border: none;
+    background: var(--accent); color: #fff;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; margin-bottom: 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-danger {
+    width: 100%; padding: 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--accent2);
+    background: transparent; color: var(--accent2);
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; margin-top: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; text-align: center;
+  }
+  .stat-val { font-size: 28px; font-weight: 800; color: var(--accent); }
+  .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .toast {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 10px 20px;
+    font-size: 14px; font-weight: 600;
+    z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--green); color: var(--green); }
+  .toast.error   { border-color: var(--accent2); color: var(--accent2); }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+
+  /* LIGHT THEME */
+  body.light {
+    --bg: #f0f2f5;
+    --surface: #ffffff;
+    --surface2: #e8eaf0;
+    --accent: #2d6fd4;
+    --accent2: #c0392b;
+    --green: #27804f;
+    --text: #1a1d2e;
+    --muted: #6b7080;
+    --border: #d0d4e0;
+  }
+  body.light header { box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+  .theme-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--muted);
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>CMR</h1>
+    <span id="header-date"></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="header-count" style="font-size:13px;color:var(--muted)"></span>
+    <div class="theme-btn" id="theme-btn" onclick="toggleTheme()">☀️</div>
+    <div class="theme-btn" onclick="toggleSettings()" title="Settings">⚙️</div>
+  </div>
+</header>
+
+<div id="settings-panel" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;background:rgba(0,0,0,0.5)" onclick="toggleSettings()">
+  <div onclick="event.stopPropagation()" style="position:absolute;top:0;right:0;width:80%;max-width:320px;height:100%;background:var(--surface);padding:24px 20px;display:flex;flex-direction:column;gap:20px;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:17px;font-weight:700;color:var(--text)">Settings</div>
+      <div onclick="toggleSettings()" style="font-size:22px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px 8px">✕</div>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Appearance</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+        <span style="font-size:14px;color:var(--text)">Dark / Light theme</span>
+        <div class="theme-btn" id="theme-btn-settings" onclick="toggleTheme()">☀️</div>
+      </div>
+    </div>
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Notes</div>
+        <span onclick="startVoiceSingle('settings-notes','text')" id="mic-settings-notes" style="cursor:pointer;font-size:18px;-webkit-tap-highlight-color:transparent">🎙</span>
+      </div>
+      <textarea id="settings-notes" placeholder="Field notes, reminders, observations…" oninput="saveSettingsNotes()" style="width:100%;height:140px;font-size:14px;padding:10px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);resize:vertical;box-sizing:border-box"></textarea>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Numbering</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <div style="font-size:14px;color:var(--text);font-weight:600">ID per color</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">Each mark color restarts numbering from 1. Off = continuous numbering across colors.</div>
+        </div>
+        <div onclick="toggleIdPerColor()" id="id-per-color-track" style="position:relative;width:44px;height:24px;border-radius:12px;background:var(--border);cursor:pointer;transition:background 0.2s;-webkit-tap-highlight-color:transparent;flex-shrink:0">
+          <div id="id-per-color-knob" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left 0.2s"></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">Voice dictation</div>
+      <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">Language</label>
+      <select id="voice-lang-settings" style="width:100%;font-size:14px;padding:10px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text)"
+        onchange="syncVoiceLang(this.value)">
+        <option value="it-IT">🇮🇹 Italiano</option>
+        <option value="es-ES">🇪🇸 Español</option>
+        <option value="en-GB">🇬🇧 English (UK)</option>
+        <option value="fr-FR">🇫🇷 Français</option>
+        <option value="de-DE">🇩🇪 Deutsch</option>
+        <option value="pt-PT">🇵🇹 Português</option>
+        <option value="en-US">🇺🇸 English (US)</option>
+      </select>
+      <div id="settings-voice-hint" style="font-size:12px;color:var(--muted);margin-top:8px;padding:8px 10px;background:var(--surface2);border-radius:8px"></div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('new')">+ NEW</div>
+  <div class="tab" onclick="showTab('recap')">Recapture</div>
+  <div class="tab" onclick="showTab('list')">History</div>
+  <div class="tab" onclick="showTab('export')">Stats <span id="export-badge" style="display:none;background:var(--accent2);color:#fff;border-radius:10px;font-size:10px;font-weight:700;padding:1px 5px;vertical-align:middle"></span></div>
+</div>
+
+<!-- TAB: NUOVO -->
+<div class="page active" id="tab-new">
+
+  <div class="card">
+    <div onclick="toggleSession()" style="cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none">
+      <div class="card-title" style="margin-bottom:6px">Session</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <label style="font-size:11px;color:var(--muted);font-weight:600">Date</label>
+          <input type="date" id="new-date" onclick="event.stopPropagation()" style="width:100%;">
+        </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <label style="font-size:11px;color:var(--muted);font-weight:600">Temperature (°C)</label>
+          <div style="position:relative;display:flex;align-items:center">
+            <input type="number" id="new-temp" inputmode="decimal" placeholder="—" step="0.1" onclick="event.stopPropagation()" style="width:100%;padding:8px 28px 8px 10px;font-size:14px;text-align:right">
+            <span style="position:absolute;right:10px;font-size:12px;color:var(--muted);pointer-events:none">°C</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;padding:8px 10px;border-radius:10px;border:2px solid var(--border);background:var(--surface2);color:var(--muted);font-size:13px;font-weight:600;white-space:nowrap;flex-shrink:0">
+          More <span id="session-arrow" style="font-size:11px;transition:transform 0.2s;display:inline-block">▼</span>
+        </div>
+      </div>
+    </div>
+    <div id="session-body" style="display:none">
+      <div style="height:12px"></div>
+      <div class="row" style="margin-bottom:12px">
+        <div class="field">
+          <label>Wind (m/s)</label>
+          <input type="number" id="new-wind" inputmode="decimal" placeholder="—" step="0.1" min="0">
+        </div>
+        <div class="field">
+          <label>Humidity (%)</label>
+          <input type="number" id="new-humidity" inputmode="decimal" placeholder="—" step="1" min="0" max="100">
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:12px">
+        <div class="field">
+          <label>Dew point (°C)</label>
+          <input type="number" id="new-dewpoint" inputmode="decimal" placeholder="—" step="0.1">
+        </div>
+        <div class="field">
+          <label>Pressure (hPa)</label>
+          <input type="number" id="new-pressure" inputmode="decimal" placeholder="—" step="0.1">
+        </div>
+      </div>
+      <div>
+        <label>Weather</label>
+        <div class="sky-toggle">
+          <div class="sky-btn" id="sky-sun"    onclick="setSky('sun')">☀️<div class="sky-label">Sunny</div></div>
+          <div class="sky-btn" id="sky-partly" onclick="setSky('partly')">⛅<div class="sky-label">Partly</div></div>
+          <div class="sky-btn" id="sky-cloud"  onclick="setSky('cloud')">☁️<div class="sky-label">Cloudy</div></div>
+          <div class="sky-btn" id="sky-rain"   onclick="setSky('rain')">🌧️<div class="sky-label">Rain</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <label>Mark color</label>
+      <div class="color-toggle">
+        <div class="color-btn active-black" id="btn-black" onclick="setColor('black')"><span style="color:#aaaaaa">●</span> Black</div>
+        <div class="color-btn" id="btn-blue"  onclick="setColor('blue')"><span style="color:#4f8ef7">●</span> Blue</div>
+        <div class="color-btn" id="btn-green" onclick="setColor('green')"><span style="color:#56b365">●</span> Green</div>
+        <div class="color-btn" id="btn-red"   onclick="setColor('red')"><span style="color:#e06c75">●</span> Red</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="margin-bottom:10px">
+      <label>Species</label>
+      <div style="position:relative">
+        <input type="text" id="new-species" placeholder="e.g. Coenagrion castellani" autocorrect="off" spellcheck="false"
+          oninput="updateHeader();syncSpeciesSelectors();spDrop('new-species','sp-drop')"
+          onfocus="spDrop('new-species','sp-drop')"
+          onblur="setTimeout(()=>spHide('sp-drop'),150)"
+          style="padding-right:32px">
+        <button type="button" onmousedown="document.getElementById('new-species').value='';updateHeader();spDrop('new-species','sp-drop');" style="position:absolute;right:0;top:0;bottom:0;width:56px;border:none;border-left:1px solid var(--border);border-radius:0 10px 10px 0;background:var(--surface2);color:var(--muted);font-size:22px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center">✕</button>
+        <div id="sp-drop" style="display:none;position:absolute;left:0;top:100%;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.3);max-height:200px;overflow-y:auto;width:100%"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:stretch">
+      <div style="
+        background:var(--surface2);
+        border:1px solid var(--border);
+        border-radius:10px;
+        padding:10px 14px;
+        display:flex;flex-direction:column;
+        align-items:center;justify-content:center;
+        min-width:64px;
+      ">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:2px">ID</div>
+        <div id="new-id" style="font-size:36px;font-weight:900;line-height:1;color:var(--text)"></div>
+      </div>
+      <div class="sex-btn" id="btn-m" onclick="setSex('m')" style="flex:1">
+        ♂<div class="sex-label">Male</div>
+      </div>
+      <div class="sex-btn" id="btn-f" onclick="setSex('f')" style="flex:1">
+        ♀<div class="sex-label">Female</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="flag-row" style="margin-bottom:0">
+      <div class="flag-btn" id="flag-teneral" onclick="toggleFlag('teneral')">
+        <div class="flag-radio" id="flag-teneral-dot"></div>
+        <span>Teneral</span>
+      </div>
+      <div class="flag-btn" id="flag-young" onclick="toggleFlag('young')">
+        <div class="flag-radio" id="flag-young-dot"></div>
+        <span>Young</span>
+      </div>
+      <div class="flag-btn" id="flag-copula" onclick="toggleFlag('copula')">
+        <div class="flag-radio" id="flag-copula-dot"></div>
+        <span>Copula</span>
+      </div>
+      <div onclick="toggleMorpho()" style="display:flex;align-items:center;gap:4px;padding:11px 10px;border-radius:10px;border:2px solid var(--border);background:var(--surface2);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;color:var(--muted);font-size:13px;font-weight:600;white-space:nowrap">
+        Body <span id="morpho-arrow" style="font-size:11px;transition:transform 0.2s;display:inline-block">▼</span>
+      </div>
+    </div>
+    <div id="morpho-body" style="display:none">
+      <div style="height:12px"></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+        <select id="voice-lang" style="flex:1;padding:9px 10px;font-size:13px;border-radius:10px" onchange="updateVoiceHint();localStorage.setItem('cmr-voice-lang',this.value)">
+          <option value="it-IT" selected>🇮🇹 Italiano</option>
+          <option value="es-ES">🇪🇸 Español</option>
+          <option value="en-GB">🇬🇧 English</option>
+          <option value="fr-FR">🇫🇷 Français</option>
+          <option value="de-DE">🇩🇪 Deutsch</option>
+          <option value="pt-PT">🇵🇹 Português</option>
+          <option value="en-US">🇺🇸 English US</option>
+        </select>
+        <button type="button" id="btn-voice" onclick="startVoiceMeasure()" style="
+          flex:2; padding:9px 12px; border-radius:10px;
+          border:2px solid var(--border); background:var(--surface2);
+          color:var(--muted); font-size:14px; font-weight:600;
+          cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+          -webkit-tap-highlight-color:transparent; transition:all 0.2s; white-space:nowrap;
+        ">🎙 Dictate</button>
+      </div>
+      <div id="voice-hint" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px"></div>
+      <div id="voice-feedback" style="display:none;font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px;padding:6px;border-radius:8px;background:var(--surface2)"></div>
+      <div class="row" style="margin-bottom:10px">
+        <div class="field">
+          <label style="display:flex;justify-content:space-between;align-items:center">Abdomen (mm)<span onclick="startVoiceSingle('new-abdomen')" style="cursor:pointer;font-size:15px;-webkit-tap-highlight-color:transparent" id="mic-new-abdomen">🎙</span></label>
+          <input type="number" id="new-abdomen" inputmode="decimal" placeholder="—" step="0.1">
+        </div>
+        <div class="field">
+          <label style="display:flex;justify-content:space-between;align-items:center">Body (mm)<span onclick="startVoiceSingle('new-body')" style="cursor:pointer;font-size:15px;-webkit-tap-highlight-color:transparent" id="mic-new-body">🎙</span></label>
+          <input type="number" id="new-body" inputmode="decimal" placeholder="—" step="0.1">
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:10px">
+        <div class="field">
+          <label style="display:flex;justify-content:space-between;align-items:center">Wing (mm)<span onclick="startVoiceSingle('new-wing-mm')" style="cursor:pointer;font-size:15px;-webkit-tap-highlight-color:transparent" id="mic-new-wing-mm">🎙</span></label>
+          <input type="number" id="new-wing-mm" inputmode="decimal" placeholder="—" step="0.1">
+        </div>
+        <div class="field">
+          <label style="display:flex;justify-content:space-between;align-items:center">Head (mm)<span onclick="startVoiceSingle('new-head')" style="cursor:pointer;font-size:15px;-webkit-tap-highlight-color:transparent" id="mic-new-head">🎙</span></label>
+          <input type="number" id="new-head" inputmode="decimal" placeholder="—" step="0.1">
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <label>Capture time</label>
+        <input type="time" id="new-time">
+      </div>
+      <div>
+        <label>Notes</label>
+        <textarea id="new-note" placeholder="Optional notes…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-submit btn-new" onclick="saveNew()">Save new</button>
+</div>
+
+<!-- TAB: RICATTURA -->
+<div class="page" id="tab-recap">
+  <div class="card">
+    <div class="card-title">Session</div>
+    <label style="font-size:11px;color:var(--muted);font-weight:600">Date</label>
+    <input type="date" id="recap-date">
+  </div>
+
+  <div class="card">
+    <div class="card-title">Already marked individual</div>
+    <div style="margin-bottom:8px">
+      <label>Species</label>
+      <div style="position:relative">
+        <input type="text" id="recap-species" autocorrect="off" spellcheck="false" placeholder="Species name"
+          oninput="resetRecapForm();spDrop('recap-species','recap-sp-drop')"
+          onfocus="spDrop('recap-species','recap-sp-drop')"
+          onblur="setTimeout(()=>spHideId('recap-sp-drop'),150)"
+          style="padding-right:60px">
+        <button type="button" onmousedown="document.getElementById('recap-species').value='';resetRecapForm();spDrop('recap-species','recap-sp-drop');" style="position:absolute;right:0;top:0;bottom:0;width:56px;border:none;border-left:1px solid var(--border);border-radius:0 10px 10px 0;background:var(--surface2);color:var(--muted);font-size:22px;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center">✕</button>
+        <div id="recap-sp-drop" style="display:none;position:absolute;left:0;top:100%;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.3);max-height:200px;overflow-y:auto;width:100%"></div>
+      </div>
+    </div>
+    <div class="recapture-row">
+      <div class="field">
+        <label>Individual ID</label>
+        <input type="number" id="recap-id-input" inputmode="numeric" placeholder="Enter ID"
+          oninput="scheduleRecapSearch()" onkeydown="if(event.key==='Enter'){searchRecap();this.blur()}">
+      </div>
+      <button class="btn-search" onclick="searchRecap()">Search</button>
+    </div>
+    <div class="recapture-info" id="recap-notfound" style="margin-top:8px"></div>
+    <div id="recap-form" style="display:none">
+      <input type="time" id="recap-time" style="display:none">
+      <div style="display:flex;gap:8px;align-items:stretch;margin-top:8px">
+        <div class="recapture-info found" id="recap-info" style="flex:1;margin-top:0"></div>
+        <div id="recap-morpho-toggle" style="display:none;flex-shrink:0">
+          <button id="recap-morpho-btn" onclick="toggleRecapMorpho()" style="height:100%;padding:10px 16px;border-radius:8px;border:2px solid var(--green);background:var(--surface2);color:var(--green);font-size:14px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;white-space:nowrap">Body size <span id="recap-morpho-arrow" style="font-size:11px;transition:transform 0.2s;display:inline-block">▼</span></button>
+        </div>
+      </div>
+      <div id="recap-morpho-body" style="display:none;margin-top:10px">
+        <div class="row" style="margin-bottom:10px" id="recap-row-1"></div>
+        <div class="row" id="recap-row-2"></div>
+      </div>
+      <div style="margin-top:10px">
+        <label>Notes — opt.</label>
+        <textarea id="recap-note" placeholder="Optional notes…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-submit btn-recap" id="btn-save-recap" style="display:none" onclick="saveRecap()">Register recapture</button>
+</div>
+
+<!-- TAB: LISTA -->
+<div class="page" id="tab-list">
+  <div id="records-list"></div>
+</div>
+
+<!-- TAB: EXPORT -->
+<div class="page" id="tab-export">
+  <div style="margin-bottom:10px">
+    <select id="export-species" onchange="renderExport()" style="width:100%;font-size:14px;padding:9px 12px;border-radius:10px">
+      <option value="">All species</option>
+    </select>
+  </div>
+  <div class="stats-grid" id="stats-grid"></div>
+  <div class="card" style="margin-top:4px">
+    <div onclick="toggleExportSection('sec-stimap');if(document.getElementById('sec-stimap').style.display!=='none')lazyRenderStimaP()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;user-select:none">
+      <div class="card-title" style="margin-bottom:0">Capture probability</div>
+      <span id="arrow-sec-stimap" style="font-size:11px;color:var(--muted);transition:transform 0.2s;display:inline-block">▼</span>
+    </div>
+    <div id="sec-stimap" style="display:none;margin-top:12px">
+      <div id="stimap-content"></div>
+    </div>
+  </div>
+
+
+  <div class="card" style="margin-top:4px">
+    <div onclick="toggleExportSection('sec-backup')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;user-select:none">
+      <div class="card-title" style="margin-bottom:0">Backup</div>
+      <span id="arrow-sec-backup" style="font-size:11px;color:var(--muted);transition:transform 0.2s;display:inline-block">▼</span>
+    </div>
+    <div id="sec-backup" style="display:none;margin-top:12px">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Full backup of all data (JSON). Use this to preserve fields not included in the CSV.</p>
+      <button class="btn-export" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);margin-bottom:8px" onclick="downloadBackup()">⬇ Download JSON backup</button>
+      <label for="restore-file" style="display:block;cursor:pointer">
+        <div style="border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;color:var(--muted);font-size:14px">
+          <div style="font-size:24px;margin-bottom:4px">📥</div>
+          <div id="restore-label">Tap to restore from JSON backup</div>
+        </div>
+      </label>
+      <input type="file" id="restore-file" accept=".json,.txt,application/json,text/plain,*/*" style="display:none" onchange="handleRestore(this)">
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:4px">
+    <div onclick="toggleExportSection('sec-export')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;user-select:none">
+      <div class="card-title" style="margin-bottom:0">Export</div>
+      <span id="arrow-sec-export" style="font-size:11px;color:var(--muted);transition:transform 0.2s;display:inline-block">▼</span>
+    </div>
+    <div id="sec-export" style="display:none;margin-top:12px">
+      <button class="btn-export" style="background:var(--green);margin-bottom:8px" onclick="exportSummaryCSV()">⬇ Download Summary CSV</button>
+      <button class="btn-export" style="margin-bottom:8px" onclick="exportCSV()">⬇ Download CSV</button>
+      <button class="btn-export" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);margin-bottom:0" onclick="togglePreview()">Show preview</button>
+      <div class="card" id="csv-preview" style="overflow-x:auto;display:none;margin-top:10px;margin-bottom:0">
+        <div class="card-title">CSV Preview</div>
+        <pre id="csv-text" style="font-size:10px;color:var(--muted);white-space:pre"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:4px">
+    <div onclick="toggleExportSection('sec-import')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;user-select:none">
+      <div class="card-title" style="margin-bottom:0">Import CSV</div>
+      <span id="arrow-sec-import" style="font-size:11px;color:var(--muted);transition:transform 0.2s;display:inline-block">▼</span>
+    </div>
+    <div id="sec-import" style="display:none;margin-top:12px">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Load an existing CMR file. Existing data will be <strong style="color:var(--accent2)">replaced</strong>.</p>
+      <label for="import-file" style="display:block;cursor:pointer">
+        <div id="import-drop" style="border:2px dashed var(--border);border-radius:10px;padding:22px;text-align:center;color:var(--muted);font-size:14px;transition:border-color 0.2s">
+          <div style="font-size:28px;margin-bottom:6px">📂</div>
+          <div id="import-label">Tap to choose a .csv file</div>
+        </div>
+      </label>
+      <input type="file" id="import-file" accept=".csv,text/csv" style="display:none" onchange="handleImport(this)">
+      <div id="import-feedback" style="display:none;margin-top:10px;font-size:13px;padding:10px 12px;border-radius:8px;"></div>
+      <button class="btn-export" id="btn-confirm-import" style="display:none;margin-top:10px;margin-bottom:0;background:var(--accent2);" onclick="confirmImport()">Confirm import</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:4px;border-color:var(--accent2)">
+    <div onclick="toggleExportSection('sec-danger')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;user-select:none">
+      <div class="card-title" style="margin-bottom:0;color:var(--accent2)">Danger zone</div>
+      <span id="arrow-sec-danger" style="font-size:11px;color:var(--accent2);transition:transform 0.2s;display:inline-block">▼</span>
+    </div>
+    <div id="sec-danger" style="display:none;margin-top:12px">
+      <button class="btn-danger" onclick="resetData()">Delete all data</button>
+    </div>
+  </div>
+  <div style="text-align:center;color:var(--muted);font-size:12px;margin-top:16px">by Gianandrea La Porta - v. 1.6</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+document.addEventListener('touchstart', function(){}, {passive: true});
+
+// ---- STATE ----
+let db = loadDB();
+let lastExportedCount = parseInt(localStorage.getItem('cmr-exported-count') || '0');
+let currentSex    = null;
+let currentColor  = 'black';
+let currentTeneral = 'n';
+let currentCopula  = 'n';
+let currentYoung   = 'n';
+let currentSky    = null;
+let recapTarget   = null;
+let idPerColor    = localStorage.getItem('cmr-id-per-color') === 'true';
+const today = new Date().toISOString().slice(0, 10);
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem('cmr2026');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // migrate: ensure every record has captimes populated from captime/occasion
+      // migrate: couple → copula
+      (parsed.records || []).forEach(r => {
+        if (!r.captimes) r.captimes = {};
+        if (r.occasion && r.captime && !r.captimes[r.occasion]) {
+          r.captimes[r.occasion] = r.captime;
+        }
+        if (r.couple !== undefined && r.copula === undefined) {
+          r.copula = r.couple;
+          delete r.couple;
+        }
+      });
+      return parsed;
+    }
+  } catch(e) {}
+  return { dates: [], records: [] };
+}
+function saveDB() { localStorage.setItem('cmr2026', JSON.stringify(db)); }
+function saveSettingsNotes() {
+  const el = document.getElementById('settings-notes');
+  if (el) localStorage.setItem('cmr-notes', el.value);
+}
+
+function nextId(species, color) {
+  const sp = (species || '').trim().toLowerCase();
+  let pool = sp ? db.records.filter(r => (r.species || '').trim().toLowerCase() === sp) : db.records;
+  if (idPerColor && color) pool = pool.filter(r => r.color === color);
+  if (!pool.length) return 1;
+  return Math.max(...pool.map(r => r.id)) + 1;
+}
+
+function ensureDate(d) {
+  if (!db.dates.includes(d)) db.dates.push(d);
+  db.dates.sort();
+}
+
+// ---- UI HELPERS ----
+function showTab(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active','active-recap','active-export','active-list'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const idx = ['new','recap','list','export'].indexOf(name);
+  const tabEl = document.querySelectorAll('.tab')[idx];
+  const cls = { recap: 'active-recap', export: 'active-export', list: 'active-list' };
+  tabEl.classList.add(cls[name] || 'active');
+  if (name !== 'recap') resetRecapForm();
+  if (name === 'new')  { updateHeader(); }
+  if (name === 'recap') {
+    refreshRecapSpeciesList();
+    const newSp = document.getElementById('new-species');
+    const recapSp = document.getElementById('recap-species');
+    if (newSp && recapSp && newSp.value) recapSp.value = newSp.value;
+  }
+  if (name === 'list')   renderList();
+  if (name === 'export') renderExport();
+}
+
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function setSex(s) {
+  currentSex = s;
+  document.getElementById('btn-m').className = 'sex-btn' + (s === 'm' ? ' active-m' : '');
+  document.getElementById('btn-f').className = 'sex-btn' + (s === 'f' ? ' active-f' : '');
+  if (s) {
+    const timeEl = document.getElementById('new-time');
+    if (!timeEl.value) timeEl.value = new Date().toTimeString().slice(0, 5);
+  }
+}
+
+function toggleFlag(field) {
+  if (field === 'teneral') currentTeneral = currentTeneral === 'y' ? 'n' : 'y';
+  else if (field === 'copula') currentCopula = currentCopula === 'y' ? 'n' : 'y';
+  else if (field === 'young')  currentYoung  = currentYoung  === 'y' ? 'n' : 'y';
+  const val = field === 'teneral' ? currentTeneral : field === 'copula' ? currentCopula : currentYoung;
+  document.getElementById('flag-' + field).className = 'flag-btn' + (val === 'y' ? ' active' : '');
+}
+
+function resetFlags() {
+  currentTeneral = 'n'; currentCopula = 'n'; currentYoung = 'n';
+  ['teneral','copula','young'].forEach(f => {
+    document.getElementById('flag-' + f).className = 'flag-btn';
+  });
+}
+
+function setSky(s) {
+  currentSky = currentSky === s ? null : s;
+  ['sun','partly','cloud','rain'].forEach(k => {
+    document.getElementById('sky-' + k).className = 'sky-btn' + (currentSky === k ? ' active' : '');
+  });
+}
+
+const colorBg = { black: 'rgba(170,170,170,0.15)', blue: 'rgba(79,142,247,0.2)', green: 'rgba(86,179,101,0.2)', red: 'rgba(224,108,117,0.2)' };
+const colorBorder = { black: '#aaa', blue: '#4f8ef7', green: '#56b365', red: '#e06c75' };
+
+function setColor(c) {
+  currentColor = c;
+  ['black','blue','green','red'].forEach(col => {
+    document.getElementById('btn-' + col).className = 'color-btn' + (c === col ? ' active-' + col : '');
+  });
+  const idBox = document.getElementById('new-id').parentElement;
+  idBox.style.background = colorBg[c] || 'var(--surface2)';
+  idBox.style.borderColor = colorBorder[c] || 'var(--border)';
+  if (idPerColor) document.getElementById('new-id').textContent = nextId(
+    document.getElementById('new-species') ? document.getElementById('new-species').value : '', c
+  );
+}
+
+function updateVoiceHint() {
+  const lang = (document.getElementById('voice-lang') || {}).value || 'en-US';
+  const hints = {
+    'it-IT': 'Es: "12 virgola 3" oppure "12 3 22 4"',
+    'en-US': 'e.g. "12.5 18 22 4" or "abdomen 12.5"',
+    'en-GB': 'e.g. "12.5 18 22 4" or "abdomen 12.5"',
+    'fr-FR': 'ex: "12 virgule 3" ou "12 3 22 4"',
+    'de-DE': 'z.B. "12 Komma 3" oder "12 3 22 4"',
+    'es-ES': 'ej: "12 coma 3" o "12 3 22 4"',
+    'pt-PT': 'ex: "12 vírgula 3" ou "12 3 22 4"',
+  };
+  const el = document.getElementById('voice-hint');
+  if (el) el.textContent = hints[lang] || '';
+}
+
+function startVoiceSingle(fieldId, mode) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { toast('Speech recognition not supported', 'error'); return; }
+  const mic = document.getElementById('mic-' + fieldId);
+  const input = document.getElementById(fieldId);
+  const rec = new SpeechRecognition();
+  rec.lang = (document.getElementById('voice-lang') || document.getElementById('voice-lang-settings') || {}).value || 'en-US';
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+
+  if (mic) mic.textContent = '🔴';
+
+  rec.onresult = (e) => {
+    const raw = e.results[0][0].transcript;
+    if (mode === 'text') {
+      const prev = input.value;
+      input.value = prev ? prev + ' ' + raw : raw;
+      input.dispatchEvent(new Event('input'));
+      toast('✓ note added');
+    } else {
+      const text = raw.toLowerCase()
+        .replace(/(\d+)\s*(?:punto|virgola|point)\s*(\d+)/g, '$1.$2')
+        .replace(/(?:^|\s)(?:punto|virgola|point)\s*(\d+)/g, '0.$1')
+        .replace(',', '.').replace(/[^\d.]/g, '');
+      const val = parseFloat(text);
+      if (!isNaN(val)) {
+        input.value = val;
+        toast('✓ ' + val + ' mm');
+      } else {
+        toast('Value not recognised', 'error');
+      }
+    }
+    if (mic) mic.textContent = '🎙';
+  };
+  rec.onerror = () => { if (mic) mic.textContent = '🎙'; };
+  rec.onend   = () => { if (mic) mic.textContent = '🎙'; };
+  rec.start();
+}
+
+function startVoiceMeasure() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    toast('Speech recognition not supported on this browser', 'error');
+    return;
+  }
+  const btn = document.getElementById('btn-voice');
+  const fb  = document.getElementById('voice-feedback');
+  const rec = new SpeechRecognition();
+  rec.lang = (document.getElementById('voice-lang') || {}).value || 'en-US';
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+
+  btn.style.borderColor = 'var(--accent2)';
+  btn.style.color = 'var(--accent2)';
+  btn.textContent = '🎙 Listening…';
+  fb.style.display = 'block';
+  fb.textContent = 'Say e.g.: abdomen 12.5 body 18 wing 22 head 4';
+
+  rec.onresult = (e) => {
+    const raw  = e.results[0][0].transcript.toLowerCase();
+    const text = raw
+      .replace(/(\d+)\s*(?:punto|virgola|point)\s*(\d+)/g, '$1.$2')  // "12 punto 5" → "12.5"
+      .replace(/(?:^|\s)(?:punto|virgola|point)\s*(\d+)/g, ' 0.$1'); // "punto 5" → "0.5"
+    fb.textContent = '📝 ' + raw;
+
+    const nums = [...text.matchAll(/\d+(?:[.,]\d+)?/g)].map(m => parseFloat(m[0].replace(',', '.')));
+    const fields = ['new-abdomen','new-body','new-wing-mm','new-head'];
+    const labels = ['abd','body','wing','head'];
+    let filled = [];
+
+    if (nums.length >= 2) {
+      nums.slice(0, 4).forEach((v, i) => {
+        document.getElementById(fields[i]).value = v;
+        filled.push(labels[i] + ' ' + v);
+      });
+    } else {
+      // Fallback: keyword parsing (con riferimenti per l'italiano - da controllare)
+      const parse = (keys) => {
+        for (const k of keys) {
+          const m = text.match(new RegExp(k + '[\\s:]+([\\d]+(?:[.,][\\d]+)?)'));
+          if (m) return parseFloat(m[1].replace(',', '.'));
+        }
+        return null;
+      };
+      const vals = [
+        parse(['addome','abdomen','abd']),
+        parse(['corpo','body']),
+        parse(['ala','wing']),
+        parse(['testa','head'])
+      ];
+      vals.forEach((v, i) => {
+        if (v !== null) { document.getElementById(fields[i]).value = v; filled.push(labels[i] + ' ' + v); }
+      });
+    }
+
+    fb.textContent = filled.length ? '✓ ' + filled.join(' · ') : '⚠ No values recognised';
+    resetVoiceBtn();
+  };
+  rec.onerror = (e) => {
+    fb.textContent = '⚠ Error: ' + e.error;
+    resetVoiceBtn();
+  };
+  rec.onend = resetVoiceBtn;
+
+  function resetVoiceBtn() {
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.innerHTML = '🎙 Dictate measurements';
+  }
+
+  rec.start();
+}
+
+function toggleMorpho() {
+  const body  = document.getElementById('morpho-body');
+  const arrow = document.getElementById('morpho-arrow');
+  const open  = body.style.display === 'none';
+  body.style.display    = open ? 'block' : 'none';
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function toggleSession() {
+  const body  = document.getElementById('session-body');
+  const arrow = document.getElementById('session-arrow');
+  const open  = body.style.display === 'none';
+  body.style.display  = open ? 'block' : 'none';
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function updateExportBadge() {
+  const unsaved = db.records.length - lastExportedCount;
+  const badge = document.getElementById('export-badge');
+  if (unsaved > 0) {
+    badge.textContent = unsaved;
+    badge.style.display = 'inline';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function refreshSpeciesList() {}
+
+function spDrop(inputId, dropId) {
+  const inp = document.getElementById(inputId);
+  const drop = document.getElementById(dropId);
+  if (!inp || !drop) return;
+  const q = inp.value.trim().toLowerCase();
+  const names = [...new Set(db.records.map(r => r.species).filter(Boolean))].sort();
+  const filtered = q ? names.filter(n => n.toLowerCase().includes(q)) : names;
+  if (!filtered.length) { spHide(dropId); return; }
+  drop.innerHTML = filtered.map(n =>
+    `<div class="sp-item" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:15px">${n}</div>`
+  ).join('');
+  drop.querySelectorAll('.sp-item').forEach(el => {
+    el.addEventListener('mousedown', e => { e.preventDefault(); spPick(inputId, dropId, el.textContent); });
+    el.addEventListener('touchend',  e => { e.preventDefault(); spPick(inputId, dropId, el.textContent); });
+  });
+  drop.style.display = 'block';
+  inp.placeholder = 'Select a species';
+}
+
+function spHide(dropId) {
+  spHideId(dropId);
+  const inp = document.getElementById('new-species');
+  if (inp) inp.placeholder = 'e.g. Coenagrion castellani';
+  // altri utilizzatori potrebbero personalizzare questa chiamata
+  // magari utilizzare un'impostazione di controllo su questo per la prossima versione
+}
+
+function spHideId(dropId) {
+  const drop = document.getElementById(dropId);
+  if (drop) drop.style.display = 'none';
+}
+
+function spPick(inputId, dropId, value) {
+  const inp = document.getElementById(inputId);
+  if (inp) {
+    inp.value = value;
+    if (inputId === 'new-species') { updateHeader(); syncSpeciesSelectors(); }
+    if (inputId === 'recap-species') { resetRecapForm(); }
+  }
+  spHideId(dropId);
+}
+
+function syncSpeciesSelectors() {
+  const val = (document.getElementById('new-species') || {}).value || '';
+  const sel = document.getElementById('export-species');
+  if (sel && val && [...sel.options].some(o => o.value === val)) sel.value = val;
+}
+
+function updateHeader() {
+  refreshSpeciesList();
+  document.getElementById('header-date').textContent = today;
+  document.getElementById('header-count').textContent = db.records.length + ' ind.';
+  const newDateEl = document.getElementById('new-date');
+  if (!newDateEl.value) newDateEl.value = today;
+  const sp = document.getElementById('new-species') ? document.getElementById('new-species').value : '';
+  document.getElementById('new-id').textContent = nextId(sp, currentColor);
+  const recapDateEl = document.getElementById('recap-date');
+  if (!recapDateEl.value) recapDateEl.value = today;
+}
+
+// ---- SAVE NEW ----
+function saveNew() {
+  if (!currentSex) { toast('Select sex', 'error'); return; }
+  const sessionDate = document.getElementById('new-date').value || today;
+  ensureDate(sessionDate);
+  const species  = document.getElementById('new-species').value.trim();
+  const abdomen  = document.getElementById('new-abdomen').value;
+  const body     = document.getElementById('new-body').value;
+  const wing     = document.getElementById('new-wing-mm').value;
+  const head     = document.getElementById('new-head').value;
+  const temp     = document.getElementById('new-temp').value;
+  const humidity = document.getElementById('new-humidity').value;
+  const dewpoint = document.getElementById('new-dewpoint').value;
+  const pressure = document.getElementById('new-pressure').value;
+  const wind     = document.getElementById('new-wind').value;
+  const timeEl   = document.getElementById('new-time');
+  if (!timeEl.value) timeEl.value = new Date().toTimeString().slice(0,5);
+  const captime  = timeEl.value;
+  const note     = document.getElementById('new-note').value.trim();
+  const id       = nextId(species, currentColor);
+
+  const captures = {};
+  captures[sessionDate] = 1;
+  const captimes = {};
+  captimes[sessionDate] = captime || '';
+
+  db.records.push({
+    id, name: '',
+    species:  species || '',
+    sex:      currentSex,
+    color:    currentColor,
+    teneral:  currentTeneral === 'y',
+    copula:   currentCopula  === 'y',
+    young:    currentYoung   === 'y',
+    occasion: sessionDate,
+    captures,
+    captimes,
+    abdomen:  abdomen  ? parseFloat(abdomen)  : '',
+    body:     body     ? parseFloat(body)     : '',
+    wing:     wing     ? parseFloat(wing)     : '',
+    head:     head     ? parseFloat(head)     : '',
+    temp:     temp     ? parseFloat(temp)     : '',
+    humidity: humidity ? parseFloat(humidity) : '',
+    dewpoint: dewpoint ? parseFloat(dewpoint) : '',
+    pressure: pressure ? parseFloat(pressure) : '',
+    wind:     wind     ? parseFloat(wind)     : '',
+    sky:      currentSky || '',
+    captime:  captime || '',
+    note
+  });
+
+  saveDB();
+
+  ['new-abdomen','new-body','new-wing-mm','new-head','new-time','new-note'].forEach(fid => {
+    document.getElementById(fid).value = '';
+  });
+  const morphoBody = document.getElementById('morpho-body');
+  const morphoArrow = document.getElementById('morpho-arrow');
+  if (morphoBody) morphoBody.style.display = 'none';
+  if (morphoArrow) morphoArrow.style.transform = '';
+  setSex(null);
+  resetFlags();
+  updateHeader();
+
+  updateExportBadge();
+  const btn = document.querySelector('.btn-new');
+  btn.disabled = true;
+  btn.textContent = '✓ Individual #' + id + ' saved';
+  btn.style.background = 'var(--green)';
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = 'Save new individual';
+    btn.style.background = '';
+  }, 1500);
+}
+
+// ---- RECAPTURE ----
+function toggleRecapMorpho() {
+  const body  = document.getElementById('recap-morpho-body');
+  const arrow = document.getElementById('recap-morpho-arrow');
+  const btn   = document.getElementById('recap-morpho-btn');
+  const open  = body.style.display === 'none';
+  body.style.display    = open ? 'block' : 'none';
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function resetRecapForm() {
+  recapTarget = null;
+  document.getElementById('recap-id-input').value = '';
+  document.getElementById('recap-info').innerHTML = '';
+  document.getElementById('recap-notfound').className = 'recapture-info';
+  document.getElementById('recap-notfound').textContent = '';
+  document.getElementById('recap-form').style.display = 'none';
+  document.getElementById('btn-save-recap').style.display = 'none';
+}
+
+function refreshRecapSpeciesList() {}
+
+let _recapSearchTimer = null;
+function scheduleRecapSearch() {
+  clearTimeout(_recapSearchTimer);
+  const val = document.getElementById('recap-id-input').value;
+  if (!val) { resetRecapForm(); return; }
+  _recapSearchTimer = setTimeout(searchRecap, 600);
+}
+
+function searchRecap() {
+  const idVal   = parseInt(document.getElementById('recap-id-input').value);
+  const spVal   = (document.getElementById('recap-species').value || '').trim().toLowerCase();
+  const info     = document.getElementById('recap-info');
+  const notfound = document.getElementById('recap-notfound');
+  const form     = document.getElementById('recap-form');
+  const btn      = document.getElementById('btn-save-recap');
+  recapTarget    = null;
+  notfound.className = 'recapture-info'; notfound.textContent = '';
+
+  if (!idVal) {
+    notfound.className = 'recapture-info notfound';
+    notfound.textContent = 'Enter a valid ID';
+    form.style.display = 'none'; btn.style.display = 'none'; return;
+  }
+  const rec = db.records.find(r => r.id === idVal && (!spVal || (r.species || '').toLowerCase() === spVal));
+  if (!rec) {
+    notfound.className = 'recapture-info notfound';
+    notfound.textContent = 'No individual with ID ' + idVal;
+    form.style.display = 'none'; btn.style.display = 'none'; return;
+  }
+
+  const capDates = Object.keys(rec.captures).sort().join(', ');
+  const sexSym = rec.sex === 'm' ? '♂' : '♀';
+  const missingMeasures = ['abdomen','body','wing','head'].filter(f => rec[f] === '' || rec[f] === undefined || rec[f] === null);
+  const missingHtml = missingMeasures.length === 4
+    ? `<div style="margin-top:6px;font-size:12px;color:var(--accent2)">⚠ No biometrics recorded</div>`
+    : '';
+  info.className = 'recapture-info found';
+  info.innerHTML = `${sexSym} ${rec.color}<br><span style="font-size:11px">capture: ${capDates}</span>${missingHtml}`;
+  recapTarget = rec;
+  form.style.display = 'block';
+  btn.style.display = 'block';
+  document.getElementById('recap-note').value = '';
+  document.getElementById('recap-morpho-body').style.display = 'none';
+  document.getElementById('recap-morpho-arrow').style.transform = '';
+
+  const allFields = [
+    { id: 'recap-abdomen', label: 'Abdomen (mm)', key: 'abdomen' },
+    { id: 'recap-body',    label: 'Body (mm)',    key: 'body'    },
+    { id: 'recap-wing',    label: 'Wing (mm)',    key: 'wing'    },
+    { id: 'recap-head',    label: 'Head (mm)',    key: 'head'    },
+  ];
+  const missing = allFields.filter(f => rec[f.key] === '' || rec[f.key] === undefined || rec[f.key] === null);
+  const toggle = document.getElementById('recap-morpho-toggle');
+  // Button always visible when form is shown
+  toggle.style.display = 'block';
+  const row1 = document.getElementById('recap-row-1');
+  const row2 = document.getElementById('recap-row-2');
+  row1.innerHTML = ''; row2.innerHTML = '';
+  allFields.forEach((f, i) => {
+    const val = rec[f.key] !== '' && rec[f.key] !== undefined && rec[f.key] !== null ? rec[f.key] : '';
+    const div = `<div class="field"><label>${f.label}</label><input type="number" id="${f.id}" inputmode="decimal" placeholder="—" step="0.1" value="${val}"></div>`;
+    (i < 2 ? row1 : row2).innerHTML += div;
+  });
+}
+
+function saveRecap() {
+  if (!recapTarget) return;
+  const sessionDate = document.getElementById('recap-date').value || today;
+  if (recapTarget.captures[sessionDate]) { toast('Already recorded on this date', 'error'); return; }
+
+  ensureDate(sessionDate);
+  recapTarget.captures[sessionDate] = 1;
+  recapTarget.name = 'r';
+
+  if (!recapTarget.captimes) recapTarget.captimes = {};
+  recapTarget.captimes[sessionDate] = new Date().toTimeString().slice(0,5);
+
+  ['abdomen','body','wing','head'].forEach(key => {
+    const el = document.getElementById('recap-' + key);
+    if (el && el.value && (recapTarget[key] === '' || recapTarget[key] === undefined || recapTarget[key] === null)) {
+      recapTarget[key] = parseFloat(el.value);
+    }
+  });
+
+  const note = document.getElementById('recap-note').value.trim();
+  if (note) recapTarget.note = (recapTarget.note ? recapTarget.note + ' | ' : '') + sessionDate + ': ' + note;
+
+  saveDB();
+  updateExportBadge();
+  toast('↩ Recapture #' + recapTarget.id + ' recorded');
+  document.getElementById('recap-id-input').value = '';
+  document.getElementById('recap-info').innerHTML = '';
+  document.getElementById('recap-notfound').className = 'recapture-info';
+  document.getElementById('recap-form').style.display = 'none';
+  document.getElementById('btn-save-recap').style.display = 'none';
+  recapTarget = null;
+}
+
+// ---- LIST ----
+function renderList() {
+  const container = document.getElementById('records-list');
+  if (!db.records.length) {
+    container.innerHTML = '<div class="empty">No records yet.<br>Start from the "+ New" tab.</div>';
+    return;
+  }
+
+  const colorDot = { black: '#aaaaaa', blue: '#4f8ef7', green: '#56b365', red: '#e06c75' };
+
+  const byDate = {};
+  db.records.forEach(r => {
+    Object.keys(r.captures).forEach(d => {
+      if (!byDate[d]) byDate[d] = [];
+      byDate[d].push(r);
+    });
+  });
+  Object.entries(byDate).forEach(([date, arr]) => arr.sort((a, b) => {
+    const tFor = r => {
+      if (r.captimes && r.captimes[date]) return r.captimes[date];
+      if (r.occasion === date && r.captime) return r.captime;
+      return '00:00';
+    };
+    const ta = tFor(a);
+    const tb = tFor(b);
+    if (ta !== tb) return tb.localeCompare(ta);   // orario decrescente
+    return b.id - a.id;                            // parità → ID decrescente
+  }));
+
+  let html = '';
+  Object.keys(byDate).sort().reverse().forEach(date => {
+    const nNew   = byDate[date].filter(r => r.occasion === date).length;
+    const nRecap = byDate[date].length - nNew;
+    const recapStr = nRecap > 0 ? ` · ${nRecap} recap` : '';
+    html += `<div class="day-header">${date} — ${nNew} new${recapStr}</div>`;
+    byDate[date].forEach(r => {
+      const ridx = db.records.indexOf(r);
+      const sexSym  = r.sex === 'm' ? '♂' : '♀';
+      const capDates = Object.keys(r.captures).sort();
+      const isRecap  = capDates.length > 1;
+      const badge    = isRecap
+        ? `<span class="badge recap">+${capDates.length - 1} recapture</span>`
+        : `<span class="badge">new</span>`;
+      const dot = colorDot[r.color] || '#aaaaaa';
+      const sub = [
+        r.abdomen ? 'abd ' + r.abdomen : null,
+        r.body    ? 'body ' + r.body   : null,
+        r.wing    ? 'wing ' + r.wing   : null,
+        r.head    ? 'head ' + r.head   : null
+      ].filter(Boolean).join(' · ');
+      const noteHtml = r.note ? `<div class="rec-note">"${r.note}"</div>` : '';
+      const extraBadges = [
+        r.teneral ? `<span class="badge" style="background:rgba(255,200,50,0.15);color:#f0c040">teneral</span>` : '',
+        r.copula  ? `<span class="badge" style="background:rgba(180,100,240,0.15);color:#c47ef5">copula</span>`  : '',
+        r.young   ? `<span class="badge" style="background:rgba(100,200,120,0.15);color:#4caf7d">young</span>`   : ''
+      ].filter(Boolean).join(' ');
+      const measures = [
+        r.abdomen ? `abd ${r.abdomen}` : null,
+        r.body    ? `body ${r.body}`   : null,
+        r.wing    ? `wing ${r.wing}`   : null,
+        r.head    ? `head ${r.head}`   : null
+      ].filter(Boolean);
+      const datesHtml = capDates.map(d => {
+        const ct = (r.captimes && r.captimes[d]) || '';
+        return `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:12px;color:var(--muted)">
+          ${d}
+          <input type="time" value="${ct}" onchange="saveCaptime(${ridx},'${d}',this.value);event.stopPropagation()" onclick="event.stopPropagation()"
+            style="font-size:12px;color:var(--text);background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 4px;width:84px;-webkit-tap-highlight-color:transparent">
+          ${capDates.length > 1 ? `<span onclick="removeCapture(${ridx},'${d}')" style="color:var(--accent2);font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;padding-left:2px">✕</span>` : ''}
+        </span>`;
+      }).join('');
+      const colorDotEdit = { black:'#aaaaaa', blue:'#4f8ef7', green:'#56b365', red:'#e06c75' };
+      const colorsHtml = ['black','blue','green','red'].map(c =>
+        `<span onclick="setRecordColor(${ridx},'${c}');event.stopPropagation()" style="
+          width:28px;height:28px;border-radius:50%;background:${colorDotEdit[c]};
+          cursor:pointer;display:inline-block;flex-shrink:0;
+          box-shadow:0 0 0 ${r.color===c ? '3px white,0 0 0 5px '+colorDotEdit[c] : '0px transparent'};
+          -webkit-tap-highlight-color:transparent"></span>`
+      ).join('');
+      const key = `${ridx}-${date}`;
+      const editPanelHtml = `
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:8px" onclick="event.stopPropagation()">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:11px;color:var(--muted);white-space:nowrap">Mark</span>
+            <div style="display:flex;gap:8px;align-items:center">${colorsHtml}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:11px;color:var(--muted);white-space:nowrap">Teneral</span>
+                <div onclick="toggleRecordTeneral(${ridx});event.stopPropagation()" style="position:relative;width:44px;height:24px;border-radius:12px;background:${r.teneral ? 'var(--green)' : 'var(--border)'};cursor:pointer;transition:background 0.2s;-webkit-tap-highlight-color:transparent;flex-shrink:0">
+                  <div style="position:absolute;top:3px;left:${r.teneral ? '23px' : '3px'};width:18px;height:18px;border-radius:50%;background:#fff;transition:left 0.2s"></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:11px;color:var(--muted);white-space:nowrap">Young</span>
+                <div onclick="toggleRecordYoung(${ridx});event.stopPropagation()" style="position:relative;width:44px;height:24px;border-radius:12px;background:${r.young ? 'var(--green)' : 'var(--border)'};cursor:pointer;transition:background 0.2s;-webkit-tap-highlight-color:transparent;flex-shrink:0">
+                  <div style="position:absolute;top:3px;left:${r.young ? '23px' : '3px'};width:18px;height:18px;border-radius:50%;background:#fff;transition:left 0.2s"></div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:var(--muted);white-space:nowrap">Copula</span>
+              <div onclick="toggleRecordCopula(${ridx});event.stopPropagation()" style="position:relative;width:44px;height:24px;border-radius:12px;background:${r.copula ? 'var(--green)' : 'var(--border)'};cursor:pointer;transition:background 0.2s;-webkit-tap-highlight-color:transparent;flex-shrink:0">
+                <div style="position:absolute;top:3px;left:${r.copula ? '23px' : '3px'};width:18px;height:18px;border-radius:50%;background:#fff;transition:left 0.2s"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Note</div>
+            <textarea id="note-edit-${key}" style="width:100%;height:56px;font-size:13px;resize:none" placeholder="Optional notes…" onclick="event.stopPropagation()">${r.note || ''}</textarea>
+            <button onclick="saveRecordNote(${ridx},'${key}');event.stopPropagation()" style="margin-top:4px;width:100%;padding:7px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent">Save note</button>
+          </div>
+        </div>`;
+      html += `
+        <div class="record-wrap" id="wrap-${key}">
+          <div class="record-delete" onclick="deleteRecord(${ridx})">Delete</div>
+          <div class="record-card" id="card-${key}" onclick="toggleDates('${key}')">
+            <div class="rec-id-col">
+              <div class="rec-id">${r.id}</div>
+              <div style="width:10px;height:10px;border-radius:50%;background:${dot};box-shadow:0 0 0 2px ${dot}44"></div>
+            </div>
+            <div class="rec-body">
+              ${r.species ? `<div class="rec-species">${r.species}</div>` : ''}
+              <div class="rec-main">${badge} ${extraBadges}${(() => { const t = (r.captimes && r.captimes[date]) || (!isRecap && r.captime) || ''; return t ? `<span style="font-size:11px;color:var(--muted);font-weight:400">${t}</span>` : ''; })()}</div>
+              ${noteHtml}
+              <div id="dates-${key}" style="display:none;margin-top:8px;flex-wrap:wrap;gap:6px">
+                <div style="display:flex;flex-wrap:wrap;gap:6px">${datesHtml}</div>
+                ${editPanelHtml}
+              </div>
+            </div>
+            ${measures.length ? `<div class="rec-measures">${measures.join('<br>')}</div>` : '<div></div>'}
+            <div style="font-size:18px;font-weight:700;color:var(--muted);text-align:center">${sexSym}</div>
+          </div>
+        </div>`;
+    });
+  });
+
+  container.innerHTML = html;
+  initSwipe();
+}
+
+function toggleDates(key) {
+  const el   = document.getElementById('dates-' + key);
+  const card = document.getElementById('card-' + key);
+  if (!el) return;
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'flex' : 'none';
+  if (card) card.style.borderColor = open ? '#f0c040' : '';
+}
+
+function toggleRecordTeneral(ridx) {
+  const r = db.records[ridx];
+  if (!r) return;
+  r.teneral = !r.teneral;
+  saveDB();
+  renderList();
+  toast('Teneral updated');
+}
+
+function toggleRecordYoung(ridx) {
+  const r = db.records[ridx];
+  if (!r) return;
+  r.young = !r.young;
+  saveDB();
+  renderList();
+  toast('Young updated');
+}
+
+function toggleRecordCopula(ridx) {
+  const r = db.records[ridx];
+  if (!r) return;
+  r.copula = !r.copula;
+  saveDB();
+  renderList();
+  toast('Copula updated');
+}
+
+function setRecordColor(ridx, color) {
+  const r = db.records[ridx];
+  if (!r) return;
+  r.color = color;
+  saveDB();
+  renderList();
+  toast('Color updated');
+}
+
+function saveRecordNote(ridx, key) {
+  const r = db.records[ridx];
+  if (!r) return;
+  r.note = document.getElementById('note-edit-' + key).value.trim();
+  saveDB();
+  renderList();
+  toast('Note saved');
+}
+
+function saveCaptime(ridx, date, val) {
+  const r = db.records[ridx];
+  if (!r) return;
+  if (!r.captimes) r.captimes = {};
+  r.captimes[date] = val;
+  if (r.occasion === date) r.captime = val;
+  saveDB();
+  toast('Time saved');
+}
+
+function removeCapture(ridx, date) {
+  const r = db.records[ridx];
+  if (!r) return;
+  if (Object.keys(r.captures).length <= 1) { toast('Cannot remove the only capture', 'error'); return; }
+  if (!confirm('Remove capture on ' + date + ' from individual #' + r.id + '?')) return;
+  delete r.captures[date];
+  if (Object.keys(r.captures).length === 1) r.name = '';
+  saveDB();
+  renderList();
+  toast('Capture on ' + date + ' removed');
+}
+
+function initSwipe() {
+  const DELETE_W = 80;
+  let startX, startY, curCard, isOpen = {};
+
+  document.querySelectorAll('.record-card').forEach(card => {
+    const id = card.id.replace('card-', '');
+
+    card.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      curCard = card;
+    }, {passive: true});
+
+    card.addEventListener('touchmove', e => {
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      if (Math.abs(dy) > Math.abs(dx)) return;
+      const base = isOpen[id] ? -DELETE_W : 0;
+      const x = Math.max(-DELETE_W, Math.min(0, base + dx));
+      card.style.transition = 'none';
+      card.style.transform = `translateX(${x}px)`;
+    }, {passive: true});
+
+    card.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      card.style.transition = '';
+      if (isOpen[id]) {
+        if (dx > 40) { closeCard(card, id); }
+        else         { openCard(card, id); }
+      } else {
+        if (dx < -40) { closeOthers(id); openCard(card, id); }
+        else           { closeCard(card, id); }
+      }
+    }, {passive: true});
+  });
+
+  function openCard(card, id) {
+    card.style.transform = `translateX(-${DELETE_W}px)`;
+    isOpen[id] = true;
+  }
+  function closeCard(card, id) {
+    card.style.transform = 'translateX(0)';
+    isOpen[id] = false;
+  }
+  function closeOthers(exceptId) {
+    document.querySelectorAll('.record-card').forEach(c => {
+      const cid = c.id.replace('card-', '');
+      if (cid !== exceptId && isOpen[cid]) closeCard(c, cid);
+    });
+  }
+}
+
+function deleteRecord(ridx) {
+  const r = db.records[ridx];
+  if (!r) return;
+  if (!confirm('Delete individual #' + r.id + '?')) return;
+  db.records.splice(ridx, 1);
+  saveDB();
+  updateHeader();
+  renderList();
+  toast('Individual #' + r.id + ' deleted', 'error');
+}
+
+// ---- EXPORT ----
+function buildCSV() {
+  const dates  = db.dates.slice().sort();
+  const header = ['id','name','species','sex','color','teneral','young','copula','occasion', ...dates,
+                  'abdomen','body','wing','head','temp','humidity','dewpoint','pressure','wind','sky','time','note'];
+  const rows   = [header.join(',')];
+
+  db.records.slice().sort((a,b) => {
+    const sp = (a.species || '').localeCompare(b.species || '');
+    if (sp !== 0) return sp;
+    if (a.id !== b.id) return a.id - b.id;
+    return (a.occasion || '').localeCompare(b.occasion || '');
+  }).forEach(r => {
+    const dateCols = dates.map(d => r.captures[d] ? '1' : '');
+    const v = f => (f !== '' && f !== undefined) ? f : '';
+    const row = [
+      r.id, (Object.keys(r.captures).length > 1 ? r.id + '-r' : String(r.id)), r.species || '', r.sex || '', r.color || '',
+      r.teneral ? '1' : '0', r.young ? '1' : '0', r.copula ? '1' : '0',
+      r.occasion, ...dateCols,
+      v(r.abdomen), v(r.body), v(r.wing), v(r.head),
+      v(r.temp), v(r.humidity), v(r.dewpoint), v(r.pressure), v(r.wind), r.sky || '', r.captime || '',
+      r.note ? '"' + r.note.replace(/"/g, '""') + '"' : ''
+    ];
+    rows.push(row.join(','));
+  });
+  return rows.join('\n');
+}
+
+function downloadBackup() {
+  const json = JSON.stringify(db, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'CMR_backup_' + today + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  lastExportedCount = db.records.length;
+  localStorage.setItem('cmr-exported-count', lastExportedCount);
+  updateExportBadge();
+  toast('JSON backup downloaded');
+}
+
+function handleRestore(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('restore-label').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const text = (e.target.result || '').trim().replace(/^﻿/, ''); // strip BOM
+      const parsed = JSON.parse(text);
+      if (!parsed.records || !parsed.dates) {
+        toast('File does not look like a CMR backup (missing records/dates)', 'error');
+        document.getElementById('restore-label').textContent = 'Tap to restore from JSON backup';
+        input.value = '';
+        return;
+      }
+      if (!confirm('Restore backup from "' + file.name + '"?\nThis will REPLACE all current data.')) {
+        document.getElementById('restore-label').textContent = 'Tap to restore from JSON backup';
+        input.value = '';
+        return;
+      }
+      // migrate couple → copula on restore
+      (parsed.records || []).forEach(r => {
+        if (!r.captimes) r.captimes = {};
+        if (r.occasion && r.captime && !r.captimes[r.occasion]) r.captimes[r.occasion] = r.captime;
+        if (r.couple !== undefined && r.copula === undefined) { r.copula = r.couple; delete r.couple; }
+      });
+      db = parsed;
+      saveDB();
+      updateHeader();
+      renderList();
+      renderExport();
+      toast('Backup restored: ' + db.records.length + ' records');
+    } catch(err) {
+      toast('Parse error: ' + err.message, 'error');
+    }
+    document.getElementById('restore-label').textContent = 'Tap to restore from JSON backup';
+    input.value = '';
+  };
+  reader.onerror = () => alert('FileReader error: ' + reader.error);
+  reader.readAsText(file, 'utf-8');
+}
+
+function exportSummaryCSV() {
+  const sp   = (document.getElementById('export-species') || {}).value || '';
+  const recs = sp ? db.records.filter(r => r.species === sp) : db.records;
+  const dates = [...new Set(recs.flatMap(r => Object.keys(r.captures)))].sort();
+  if (!dates.length) { toast('No data to export', 'error'); return; }
+  const rows = ['sessione,data,start,end,nNew,nRecap'];
+  dates.forEach((date, idx) => {
+    let nNew = 0, nRecap = 0;
+    const times = [];
+    recs.forEach(r => {
+      if (r.captures[date]) {
+        if (r.occasion === date) nNew++;
+        else nRecap++;
+        const t = (r.captimes && r.captimes[date]) || (r.occasion === date ? r.captime : '') || '';
+        if (t) times.push(t);
+      }
+    });
+    times.sort();
+    const tStart = times.length ? times[0]             : '';
+    const tEnd   = times.length ? times[times.length-1] : '';
+    rows.push(`${idx + 1},${date},${tStart},${tEnd},${nNew},${nRecap}`);
+  });
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'CMR_summary_' + (sp || 'all') + '_' + today + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Summary CSV downloaded');
+}
+
+function exportCSV() {
+  const csv  = buildCSV();
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'CMR2026_export_' + today + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('CSV downloaded');
+}
+
+function togglePreview() {
+  const el = document.getElementById('csv-preview');
+  if (el.style.display === 'none') {
+    document.getElementById('csv-text').textContent = buildCSV().split('\n').slice(0,20).join('\n');
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function renderExport() {
+  // Populate species selector
+  const sel = document.getElementById('export-species');
+  const isFirst = sel.options.length === 0;
+  const prev = isFirst ? ((document.getElementById('new-species') || {}).value || '') : sel.value;
+  const allSpecies = [...new Set(db.records.map(r => r.species).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">All species</option>' +
+    allSpecies.map(s => `<option value="${s}">${s}</option>`).join('');
+  sel.value = prev;
+
+  const sp = sel.value;
+  const recs = sp ? db.records.filter(r => r.species === sp) : db.records;
+
+  // Dates active for selected species
+  const activeDates = sp
+    ? [...new Set(recs.flatMap(r => Object.keys(r.captures)))].sort()
+    : db.dates.slice().sort();
+
+  const total    = recs.length;
+  const sessions = activeDates.length;
+
+  const mRec  = recs.filter(r => r.sex === 'm');
+  const fRec  = recs.filter(r => r.sex === 'f');
+  const males   = mRec.length;
+  const females = fRec.length;
+
+  const mRecap = mRec.filter(r => Object.keys(r.captures).length > 1).length;
+  const fRecap = fRec.filter(r => Object.keys(r.captures).length > 1).length;
+  const mRate  = males   ? Math.round(mRecap / males   * 100) : 0;
+  const fRate  = females ? Math.round(fRecap / females * 100) : 0;
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-val" style="color:var(--green)">${total}</div><div class="stat-lbl">Total ind.</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--green)">${sessions}</div><div class="stat-lbl">Sessions</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--accent)">♂ ${males}</div><div class="stat-lbl">Males</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--accent2)">♀ ${females}</div><div class="stat-lbl">Females</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--accent);font-size:22px">${mRate}%</div><div class="stat-lbl">Recaptures ♂ (${mRecap}/${males})</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--accent2);font-size:22px">${fRate}%</div><div class="stat-lbl">Recaptures ♀ (${fRecap}/${females})</div></div>
+  `;
+
+  const sec = document.getElementById('sec-stimap');
+  if (sec && sec.style.display !== 'none') try { renderStimaP(); } catch(e) { console.error('renderStimaP', e); }
+}
+
+function resetData() {
+  if (confirm('Delete all data? This cannot be undone.')) {
+    db = { dates: [], records: [] };
+    saveDB(); updateHeader();
+    lastExportedCount = 0;
+    localStorage.setItem('cmr-exported-count', 0);
+    updateExportBadge();
+    renderExport();
+    toast('Data deleted', 'error');
+  }
+}
+
+// ---- IMPORT ----
+let pendingImport = null;
+
+function parseCSVLine(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+    } else if (ch === ',' && !inQ) {
+      result.push(cur); cur = '';
+    } else { cur += ch; }
+  }
+  result.push(cur);
+  return result;
+}
+
+function handleImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('import-label').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const fb        = document.getElementById('import-feedback');
+    const btnConfirm = document.getElementById('btn-confirm-import');
+    try {
+      const parsed = importParseCSV(e.target.result);
+      pendingImport = parsed;
+      fb.style.cssText = 'display:block;background:rgba(86,179,101,0.1);border:1px solid var(--green);color:var(--green);margin-top:10px;font-size:13px;padding:10px 12px;border-radius:8px;';
+      fb.textContent = `✓ Found ${parsed.records.length} individuals, ${parsed.dates.length} sessions. Press "Confirm" to load.`;
+      btnConfirm.style.display = 'block';
+    } catch(err) {
+      pendingImport = null;
+      fb.style.cssText = 'display:block;background:rgba(224,108,117,0.1);border:1px solid var(--accent2);color:var(--accent2);margin-top:10px;font-size:13px;padding:10px 12px;border-radius:8px;';
+      fb.textContent = '✗ Errore nel parsing: ' + err.message;
+      btnConfirm.style.display = 'none';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function importParseCSV(text) {
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) throw new Error('Empty file or no data');
+
+  const headers  = parseCSVLine(lines[0]);
+  const iId      = headers.indexOf('id');
+  const iName    = headers.indexOf('name');
+  const iSpecies = headers.indexOf('species');
+  const iSex     = headers.indexOf('sex');
+  const iColor   = headers.indexOf('color');
+  const iOccasion = headers.indexOf('occasion');
+  const iAbdomen  = headers.indexOf('abdomen');
+  const iBody     = headers.indexOf('body');
+  const iWing     = headers.indexOf('wing');
+  const iHead     = headers.indexOf('head');
+  const iTemp     = headers.indexOf('temp');
+  const iHumidity = headers.indexOf('humidity');
+  const iDewpoint = headers.indexOf('dewpoint');
+  const iPressure = headers.indexOf('pressure');
+  const iWind     = headers.indexOf('wind');
+  const iSky      = headers.indexOf('sky');
+  const iCaptime  = headers.indexOf('time');
+  const iTeneral  = headers.indexOf('teneral');
+  const iYoung    = headers.indexOf('young');
+  const iCouple   = headers.indexOf('copula') >= 0 ? headers.indexOf('copula') : headers.indexOf('couple');
+  const iNote     = headers.indexOf('note');
+
+  if (iId < 0 || iOccasion < 0) throw new Error('Required headers missing (id, occasion)');
+
+  const dateStart = iOccasion + 1;
+  const dateEnd   = iAbdomen > 0 ? iAbdomen : headers.length;
+  const dateCols  = headers.slice(dateStart, dateEnd).filter(h => /^\d{4}-\d{2}-\d{2}$/.test(h));
+  const dateSet   = new Set(dateCols);
+
+  const records = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals  = parseCSVLine(lines[i]);
+    const rawId = vals[iId] ? vals[iId].trim() : '';
+    if (!rawId || isNaN(parseInt(rawId))) continue;
+
+    const captures = {};
+    dateCols.forEach((d, idx) => {
+      if ((vals[dateStart + idx] || '').trim() === '1') { captures[d] = 1; dateSet.add(d); }
+    });
+
+    const g = (i) => i >= 0 ? (vals[i] || '').trim() : '';
+    records.push({
+      id:       parseInt(rawId),
+      name:     g(iName),
+      species:  g(iSpecies),
+      sex:      g(iSex),
+      color:    g(iColor),
+      occasion: g(iOccasion),
+      captures,
+      teneral:  iTeneral >= 0 ? vals[iTeneral]?.trim() === '1' : false,
+      young:    iYoung   >= 0 ? vals[iYoung]?.trim()   === '1' : false,
+      copula:   iCouple  >= 0 ? vals[iCouple]?.trim()  === '1' : false,
+      abdomen:  iAbdomen  >= 0 && vals[iAbdomen]  ? parseFloat(vals[iAbdomen])  || '' : '',
+      body:     iBody     >= 0 && vals[iBody]      ? parseFloat(vals[iBody])     || '' : '',
+      wing:     iWing     >= 0 && vals[iWing]      ? parseFloat(vals[iWing])     || '' : '',
+      head:     iHead     >= 0 && vals[iHead]      ? parseFloat(vals[iHead])     || '' : '',
+      temp:     iTemp     >= 0 && vals[iTemp]      ? parseFloat(vals[iTemp])     || '' : '',
+      humidity: iHumidity >= 0 && vals[iHumidity]  ? parseFloat(vals[iHumidity]) || '' : '',
+      dewpoint: iDewpoint >= 0 && vals[iDewpoint]  ? parseFloat(vals[iDewpoint]) || '' : '',
+      pressure: iPressure >= 0 && vals[iPressure]  ? parseFloat(vals[iPressure]) || '' : '',
+      wind:     iWind     >= 0 && vals[iWind]      ? parseFloat(vals[iWind])     || '' : '',
+      sky:      g(iSky),
+      captime:  g(iCaptime),
+      note:     g(iNote)
+    });
+  }
+
+  if (!records.length) throw new Error('No valid records found');
+  return { dates: Array.from(dateSet).sort(), records };
+}
+
+function confirmImport() {
+  if (!pendingImport) return;
+  if (!confirm(`Replace the ${db.records.length} current records with ${pendingImport.records.length} imported records?`)) return;
+  db = pendingImport;
+  pendingImport = null;
+  saveDB();
+  updateHeader();
+  renderExport();
+  document.getElementById('import-feedback').style.display = 'none';
+  document.getElementById('btn-confirm-import').style.display = 'none';
+  document.getElementById('import-label').textContent = 'Tap to choose a .csv file';
+  document.getElementById('import-file').value = '';
+  lastExportedCount = 0;
+  localStorage.setItem('cmr-exported-count', 0);
+  updateExportBadge();
+  toast('✓ ' + db.records.length + ' record imported');
+}
+
+// ---- ICON + MANIFEST ----
+(function() {
+  const sz = 512;
+  const c  = document.createElement('canvas');
+  c.width  = sz; c.height = sz;
+  const ctx = c.getContext('2d');
+
+  // background — sfondi di colore verde 
+  const grad = ctx.createLinearGradient(0, 0, sz, sz);
+  grad.addColorStop(0, '#4cd964');
+  grad.addColorStop(1, '#34a853');
+  ctx.fillStyle = grad;
+  roundRect(ctx, 0, 0, sz, sz, sz * 0.22);
+  ctx.fill();
+
+  // CMR text
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `bold ${sz * 0.38}px -apple-system, BlinkMacSystemFont, Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('CMR', sz / 2, sz / 2);
+
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  const png = c.toDataURL('image/png');
+  document.getElementById('apple-icon').href = png;
+  document.getElementById('favicon').href    = png;
+
+  // inline manifest
+  const manifest = {
+    name: 'CMR',
+    short_name: 'CMR',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#0f1117',
+    theme_color: '#1c1f2b',
+    icons: [{ src: png, sizes: '512x512', type: 'image/png' }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  document.getElementById('pwa-manifest').href = URL.createObjectURL(blob);
+})();
+
+// ---- THEME ----
+function toggleTheme() {
+  const light = document.body.classList.toggle('light');
+  const icon = light ? '🌙' : '☀️';
+  document.getElementById('theme-btn').textContent = icon;
+  const s = document.getElementById('theme-btn-settings');
+  if (s) s.textContent = icon;
+  localStorage.setItem('cmr-theme', light ? 'light' : 'dark');
+}
+(function() {
+  if (localStorage.getItem('cmr-theme') === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('theme-btn').textContent = '🌙';
+  }
+})();
+
+// ---- STIMA P ----
+function enrichSessions(sessions, phi) {
+  let cumNew = 0;
+  return sessions.map((s, i) => {
+    const poolNaive = cumNew;
+    let poolCorr = cumNew;
+    if (phi < 1.0 && i > 0) {
+      poolCorr = 0;
+      for (let j = 0; j < i; j++) {
+        const dt = (new Date(s.date) - new Date(sessions[j].date)) / 86400000;
+        poolCorr += sessions[j].nNew * Math.pow(phi, dt);
+      }
+    }
+    cumNew += s.nNew;
+    const pNaive = poolNaive > 0 ? s.nRecap / poolNaive : null;
+    const pCorr  = poolCorr  > 0 ? Math.min(s.nRecap / poolCorr, 1) : null;
+    return { ...s, poolNaive, poolCorr, pNaive, pCorr };
+  });
+}
+
+function pColor(p) {
+  if (p === null) return 'var(--muted)';
+  if (p >= 0.30) return '#198754';
+  if (p >= 0.25) return '#fd7e14';
+  return '#dc3545';
+}
+
+function lazyRenderStimaP() {
+  const el = document.getElementById('stimap-content');
+  if (el) el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Computing…</div>';
+  setTimeout(renderStimaP, 30);
+}
+
+// CJS MLE — constant phi (daily survival) and p (capture probability)
+function cjsMLE(recs, dates) {
+  const k = dates.length;
+  if (k < 3) return null;
+
+  // m-array: mArr[i][j] = released at i, next captured at j; R[i] = released at i
+  // evoluzione del precedente codice di run
+  const mArr = Array.from({length: k}, () => new Array(k).fill(0));
+  const R = new Array(k).fill(0);
+  recs.forEach(r => {
+    const caps = dates.map((d, i) => r.captures[d] ? i : -1).filter(i => i >= 0);
+    for (let ci = 0; ci < caps.length; ci++) {
+      const i = caps[ci];
+      R[i]++;
+      if (ci + 1 < caps.length) mArr[i][caps[ci + 1]]++;
+    }
+  });
+
+  const ms = dates.map(d => new Date(d).getTime());
+  const dayDiff = (i, j) => (ms[j] - ms[i]) / 86400000;
+
+  function logLik(lp, lq) {
+    const phi = 1 / (1 + Math.exp(-lp));
+    const p   = 1 / (1 + Math.exp(-lq));
+    let ll = 0;
+    for (let i = 0; i < k - 1; i++) {
+      if (R[i] === 0) continue;
+      let sumQ = 0, mSum = 0;
+      for (let j = i + 1; j < k; j++) {
+        const q = Math.pow(phi, dayDiff(i, j)) * Math.pow(1 - p, j - i - 1) * p;
+        if (mArr[i][j] > 0) ll += mArr[i][j] * Math.log(Math.max(1e-15, q));
+        sumQ += q; mSum += mArr[i][j];
+      }
+      const notRecap = R[i] - mSum;
+      if (notRecap > 0) ll += notRecap * Math.log(Math.max(1e-15, 1 - sumQ));
+    }
+    return ll;
+  }
+
+  function negLL(params) { return -logLik(params[0], params[1]); }
+
+  // funzione di Nelder-Mead
+  function nelderMead(f, x0) {
+    const n = x0.length;
+    let S = [x0.slice()];
+    for (let i = 0; i < n; i++) { const p = x0.slice(); p[i] += 0.5; S.push(p); }
+    let fv = S.map(p => f(p));
+    for (let iter = 0; iter < 800; iter++) {
+      const ord = fv.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]);
+      S = ord.map(x => S[x[1]]); fv = ord.map(x => x[0]);
+      if (fv[n] - fv[0] < 1e-9) break;
+      const c = new Array(n).fill(0);
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) c[j] += S[i][j] / n;
+      const xr = c.map((v, j) => 2*v - S[n][j]); const fr = f(xr);
+      if (fr < fv[0]) {
+        const xe = c.map((v, j) => 3*v - 2*S[n][j]); const fe = f(xe);
+        S[n] = fe < fr ? xe : xr; fv[n] = Math.min(fe, fr);
+      } else if (fr < fv[n-1]) { S[n] = xr; fv[n] = fr; }
+      else {
+        if (fr < fv[n]) {
+          // outside contraction
+          const xoc = c.map((v, j) => 1.5*v - 0.5*S[n][j]); const foc = f(xoc);
+          if (foc <= fr) { S[n] = xoc; fv[n] = foc; }
+          else for (let i = 1; i <= n; i++) { S[i] = S[0].map((s, j) => 0.5*(s+S[i][j])); fv[i] = f(S[i]); }
+        } else {
+          // inside contraction
+          const xic = c.map((v, j) => 0.5*v + 0.5*S[n][j]); const fic = f(xic);
+          if (fic < fv[n]) { S[n] = xic; fv[n] = fic; }
+          else for (let i = 1; i <= n; i++) { S[i] = S[0].map((s, j) => 0.5*(s+S[i][j])); fv[i] = f(S[i]); }
+        }
+      }
+    }
+    return S[0];
+  }
+
+  const x0 = [Math.log(4), Math.log(0.3/0.7)]; // logit(0.8), logit(0.3)
+  const xOpt = nelderMead(negLL, x0);
+  const phi_hat = 1 / (1 + Math.exp(-xOpt[0]));
+  const p_hat   = 1 / (1 + Math.exp(-xOpt[1]));
+
+  // Numerical Hessian of logL for SE via delta method
+  const h = 0.001;
+  const f0 = logLik(xOpt[0], xOpt[1]);
+  const H00 = (logLik(xOpt[0]+h,xOpt[1]) - 2*f0 + logLik(xOpt[0]-h,xOpt[1])) / (h*h);
+  const H11 = (logLik(xOpt[0],xOpt[1]+h) - 2*f0 + logLik(xOpt[0],xOpt[1]-h)) / (h*h);
+  const H01 = (logLik(xOpt[0]+h,xOpt[1]+h) - logLik(xOpt[0]+h,xOpt[1]-h)
+             - logLik(xOpt[0]-h,xOpt[1]+h) + logLik(xOpt[0]-h,xOpt[1]-h)) / (4*h*h);
+  const det = H00*H11 - H01*H01;
+  let se_phi=null, se_p=null, ci_phi=[null,null], ci_p=[null,null];
+  if (det !== 0 && -H11/det > 0 && -H00/det > 0) {
+    const sl = Math.sqrt(-H11/det), sq = Math.sqrt(-H00/det);
+    se_phi = phi_hat*(1-phi_hat)*sl;
+    se_p   = p_hat*(1-p_hat)*sq;
+    const z = 1.96;
+    ci_phi = [1/(1+Math.exp(-(xOpt[0]-z*sl))), 1/(1+Math.exp(-(xOpt[0]+z*sl)))];
+    ci_p   = [1/(1+Math.exp(-(xOpt[1]-z*sq))), 1/(1+Math.exp(-(xOpt[1]+z*sq)))];
+  }
+  return { phi: phi_hat, p: p_hat, se_phi, se_p, ci_phi, ci_p, logL: f0 };
+}
+
+const _stimapMLECache = { key: null, result: null };
+
+function renderStimaP() {
+  const sp   = (document.getElementById('export-species') || {}).value || '';
+  const recs = sp ? db.records.filter(r => r.species === sp) : db.records;
+
+  // build sessions from db
+  const dateSet = [...new Set(recs.flatMap(r => Object.keys(r.captures)))].sort();
+  if (!dateSet.length) {
+    document.getElementById('stimap-content').innerHTML = '<div style="color:var(--muted);font-size:13px">No data available.</div>';
+    return;
+  }
+  const sessions = dateSet.map(date => {
+    let nNew = 0, nRecap = 0;
+    recs.forEach(r => {
+      if (r.captures[date]) {
+        if (r.occasion === date) nNew++; else nRecap++;
+      }
+    });
+    return { date, nNew, nRecap };
+  });
+
+  // CJS MLE (cached almeno si risparmiano energie di ricalcolo)
+  const captureFingerprint = recs
+    .map(r => r.id + ':' + Object.keys(r.captures).sort().join('+'))
+    .sort().join('|');
+  const _cacheKey = sp + '|' + captureFingerprint;
+  if (_stimapMLECache.key !== _cacheKey) {
+    try { _stimapMLECache.result = cjsMLE(recs, dateSet); }
+    catch(e) { _stimapMLECache.result = null; }
+    _stimapMLECache.key = _cacheKey;
+  }
+  const mle = _stimapMLECache.result;
+  const phi = mle ? mle.phi : 0.8;
+
+  const enriched = enrichSessions(sessions, phi);
+
+
+  const fmt = v => v !== null ? v.toFixed(3) : '—';
+
+  // MLE display
+  const mleReady = mle !== null;
+  const p_mle  = mleReady ? mle.p   : null;
+  const phi_mle = mleReady ? mle.phi : null;
+  const pCol   = pColor(p_mle);
+  const phiCol = pCol;
+  const fmtEst = (v, se) => {
+    if (v === null) return '—';
+    const str = v.toFixed(3);
+    return se !== null ? `${str} <span style="font-size:11px;color:var(--muted)">± ${se.toFixed(3)}</span>` : str;
+  };
+  const fmtCI = (ci) => ci && ci[0] !== null ? `95% CI [${ci[0].toFixed(3)} – ${ci[1].toFixed(3)}]` : '';
+
+  const semaforoHtml = `
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">CJS · φ(·) p(·) · MLE</div>
+    <div style="padding:14px;background:var(--surface2);border-radius:10px;border:2px solid ${mleReady ? pCol : 'var(--border)'}">
+      <div style="display:flex;align-items:stretch;gap:0">
+        <div style="text-align:center;flex:1;padding:4px 6px">
+          <div style="font-size:22px;font-weight:900;color:${pCol}">${p_mle !== null ? 'p̂ = ' + p_mle.toFixed(3) : '—'}</div>
+          ${mle && mle.se_p !== null ? `<div style="font-size:10px;color:var(--muted);margin-top:1px">SE ${mle.se_p.toFixed(3)}</div>` : ''}
+          <div style="font-size:10px;color:var(--muted);margin-top:1px">${fmtCI(mle && mle.ci_p)}</div>
+        </div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div style="text-align:center;flex:1;padding:4px 6px">
+          <div style="font-size:22px;font-weight:900;color:${phiCol}">${phi_mle !== null ? 'φ = ' + phi_mle.toFixed(3) : '—'}</div>
+          ${mle && mle.se_phi !== null ? `<div style="font-size:10px;color:var(--muted);margin-top:1px">SE ${mle.se_phi.toFixed(3)}</div>` : ''}
+          <div style="font-size:10px;color:var(--muted);margin-top:1px">${fmtCI(mle && mle.ci_phi)}</div>
+        </div>
+      </div>
+      ${mleReady ? '' : '<div style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px">CJS MLE requires ≥ 3 sessions</div>'}
+    </div>`;
+
+  // tabella sessioni
+  const rows = enriched.map((s, i) => `
+    <tr style="font-size:12px">
+      <td style="padding:5px 6px;color:var(--muted)">${i+1}</td>
+      <td style="padding:5px 6px">${s.date}</td>
+      <td style="padding:5px 6px;text-align:center">${s.nNew}</td>
+      <td style="padding:5px 6px;text-align:center">${s.nRecap}</td>
+      <td style="padding:5px 6px;text-align:center;color:var(--muted)">${s.poolNaive}</td>
+      <td style="padding:5px 6px;text-align:center;font-weight:700;color:${pColor(s.pCorr)}">${fmt(s.pCorr)}</td>
+    </tr>`).join('');
+
+  // field decision
+  const _fdActive = sessions.filter(s => s.nNew + s.nRecap > 0);
+  const _fdRates  = _fdActive.map(s => s.nNew / (s.nNew + s.nRecap));
+  const _fdLast3  = _fdActive.slice(-3);
+  const _fdN3num  = _fdLast3.reduce((a, x) => a + x.nNew, 0);
+  const _fdN3den  = _fdLast3.reduce((a, x) => a + x.nNew + x.nRecap, 0);
+  const _fdNov3   = _fdActive.length >= 3 && _fdN3den > 0 ? _fdN3num / _fdN3den : null;
+  const _fdNovL   = _fdRates.length > 0 ? _fdRates[_fdRates.length - 1] : null;
+  const _fdN      = _fdRates.length;
+  const _fdDown   = _fdN >= 2 && _fdRates[_fdN-1] <= _fdRates[_fdN-2];
+  const _fdNovCol = v => v === null ? 'var(--muted)' : v < 0.15 ? '#198754' : v < 0.25 ? '#fd7e14' : '#dc3545';
+  const _fdPct    = v => v !== null ? Math.round(v * 100) + '%' : '—';
+  const fieldDecisionHtml = `
+    <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">New individuals · last 3 sessions</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        ${_fdLast3.map(s => {
+          const nov = s.nNew + s.nRecap > 0 ? s.nNew / (s.nNew + s.nRecap) : null;
+          return `<div style="background:var(--surface2);border-radius:10px;padding:10px 6px;text-align:center">
+            <div style="font-size:24px;font-weight:900;color:${_fdNovCol(nov)}">${_fdPct(nov)}</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:3px">${s.nNew} / ${s.nNew+s.nRecap}</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:1px">${s.date}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+
+  document.getElementById('stimap-content').innerHTML = `
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase">
+            <th style="padding:4px 6px;text-align:left">#</th>
+            <th style="padding:4px 6px;text-align:left">Date</th>
+            <th style="padding:4px 6px;text-align:center">New</th>
+            <th style="padding:4px 6px;text-align:center">Recap</th>
+            <th style="padding:4px 6px;text-align:center">Pool</th>
+            <th style="padding:4px 6px;text-align:center">p</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    ${fieldDecisionHtml}
+    <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+      ${semaforoHtml}
+    </div>`;
+}
+
+
+function toggleExportSection(id) {
+  const body  = document.getElementById(id);
+  const arrow = document.getElementById('arrow-' + id);
+  const open  = body.style.display === 'none';
+  body.style.display    = open ? 'block' : 'none';
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function toggleSettings() {
+  const p = document.getElementById('settings-panel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleIdPerColor() {
+  idPerColor = !idPerColor;
+  localStorage.setItem('cmr-id-per-color', idPerColor);
+  const track = document.getElementById('id-per-color-track');
+  const knob  = document.getElementById('id-per-color-knob');
+  track.style.background = idPerColor ? 'var(--green)' : 'var(--border)';
+  knob.style.left        = idPerColor ? '23px' : '3px';
+  updateHeader(); // !!! aggiorna l'ID visualizzato in New
+}
+
+function syncVoiceLang(val) {
+  localStorage.setItem('cmr-voice-lang', val);
+  const el = document.getElementById('voice-lang');
+  if (el) el.value = val;
+  // update hint in settings panel
+  const lang = val;
+  const isIt = lang.startsWith('it');
+  const hint = isIt
+    ? 'Dì "dodici virgola tre" per 12.3'
+    : lang.startsWith('fr') ? 'Dites "douze virgule trois" pour 12.3'
+    : lang.startsWith('de') ? 'Sagen Sie "zwölf Komma drei" für 12.3'
+    : lang.startsWith('es') ? 'Diga "doce coma tres" para 12.3'
+    : lang.startsWith('pt') ? 'Diga "doze vírgula três" para 12.3'
+    : 'Say "twelve point three" for 12.3';
+  const h = document.getElementById('settings-voice-hint');
+  if (h) h.textContent = hint;
+  updateVoiceHint();
+}
+
+// ---- INIT ----
+(function() {
+})();
+(function() {
+  if (idPerColor) {
+    const track = document.getElementById('id-per-color-track');
+    const knob  = document.getElementById('id-per-color-knob');
+    if (track) track.style.background = 'var(--green)';
+    if (knob)  knob.style.left = '23px';
+  }
+})();
+updateHeader();
+setColor(currentColor);
+updateExportBadge();
+(function(){
+  const spInput = document.getElementById('new-species');
+  if (spInput && db.records.length) {
+    const last = db.records.slice().reverse().find(r => r.species);
+    if (last) spInput.value = last.species;
+  }
+})();
+const savedVoiceLang = localStorage.getItem('cmr-voice-lang');
+if (savedVoiceLang) {
+  const el = document.getElementById('voice-lang');
+  if (el) el.value = savedVoiceLang;
+  const els = document.getElementById('voice-lang-settings');
+  if (els) els.value = savedVoiceLang;
+}
+const _initLang = (document.getElementById('voice-lang-settings') || {}).value
+               || (document.getElementById('voice-lang') || {}).value
+               || 'it-IT';
+syncVoiceLang(_initLang);
+updateVoiceHint();
+(function(){
+  const el = document.getElementById('settings-notes');
+  if (el) el.value = localStorage.getItem('cmr-notes') || '';
+})();
+</script>
+</body>
+</html>
